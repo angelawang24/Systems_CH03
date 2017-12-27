@@ -1,0 +1,36 @@
+The basis of our filesystem was that we initlaized one inode for each data 
+block.
+
+This led to both some advantages and disadvantages.
+
+One advantage was that we already had all our inodes initialized at the 
+beginning. We never had to create any inodes or data blocks.
+ 
+In addition, We were never limited by number of inodes as every single block
+in the entire structure had its own inode -- we would only run out if every 
+block had been written to. 
+
+But this does come with its drawbacks -- since we initialized an inode for every
+block, we had to allocate space for each inode. That means if even one block
+overflows to another one, the inode that originally pointed to that second 
+block is essentially useless. So we did waste some space allocating one inode
+for each block. 
+
+If we had more time, we would try to find a balance between inode number and 
+block number. Of course it would depend on the input we expected to have -- if
+we expected to have a bunch of small writes, it makes sense to have an inode for
+each block as we don't anticipate overflowing. It might even make sense to 
+decrease the size of the blocks while increasing the amount of blocks and inodes
+(although again a balance would have to be found here as inodes are a fixed 
+size). If we were doing mostly larger writes, overflow would be more common, 
+and we could decrease the number of inodes that we started with, effectively
+having fewer unused inodes sitting around.
+
+
+We were able to create files, list the files in the filesystem root directory,
+write to small files, read from small files, delete files, rename files, create
+hard links, create directories and nested directories, remove directories and
+support metadata. We were able to support some permissions and timestamps. We 
+were not able to read and write from files larger than one block. We did try to
+implement it but it is still a bit flawed. However, we were able to get most of
+the functionality.
